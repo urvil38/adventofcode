@@ -13,9 +13,9 @@ var inputFile = flag.String("inputFile", "inputs/day01.input", "Relative file pa
 
 func main() {
 	flag.Parse()
-	input := parseInputAsInts()
-	fmt.Printf("p1: %v\n", p1(input))
-	fmt.Printf("p2: %v\n", p2(input))
+	input := parseInput()
+	fmt.Println(p1(input))
+	fmt.Println(p2(input))
 }
 
 func p1(input []int) int {
@@ -43,7 +43,7 @@ func p2(input []int) int {
 	return count
 }
 
-func parseInputAsInts() []int {
+func parseInput() []int {
 	b, err := ioutil.ReadFile(*inputFile)
 	if err != nil {
 		log.Fatal(err)
