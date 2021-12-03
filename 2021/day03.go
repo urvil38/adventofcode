@@ -20,21 +20,18 @@ func main() {
 
 func p1(input []int, nl int) int {
 	var gRate int
-	for k := nl - 1; k >= 0; k-- {
-		var i0, i1 int
-		for _, v := range input {
+	ones := make([]int, nl)
+	for _, v := range input {
+		for k := nl - 1; k >= 0; k-- {
 			if (v>>k)&1 == 1 {
-				i1++
-			} else {
-				i0++
+				ones[k]++
 			}
 		}
-
-		nMax := 0
-		if i1 > i0 {
-			nMax = 1
+	}
+	for i, v := range ones {
+		if v*2 > len(input) {
+			gRate |= (1 << i)
 		}
-		gRate |= (nMax << k)
 	}
 	eRate := ^gRate & ((1 << nl) - 1)
 	return gRate * eRate
