@@ -14,8 +14,8 @@ var inputFile = flag.String("inputFile", "inputs/day04.input", "Relative file pa
 func main() {
 	flag.Parse()
 	input, boards := parseInput()
-	fmt.Println(p1(input, boards))
-	fmt.Println(p2(input, boards))
+	p1(input, boards)
+	p2(input, boards)
 }
 
 type board struct {
@@ -23,50 +23,41 @@ type board struct {
 	visited [5][5]int
 }
 
-func p1(input []int, boards []board) int {
-	var winnerBoard, currInput int
+func p1(input []int, boards []*board) {
 out:
 	for _, v := range input {
-		for i := 0; i < len(boards); i++ {
-			set(&boards[i], v)
-			if bingo(boards[i]) {
-				winnerBoard = i
-				currInput = v
+		for _, b := range boards {
+			b.set(v)
+			if b.bingo() {
+				fmt.Println(b.score(v))
 				break out
 			}
 		}
 	}
-
-	return currInput * sumNotVisited(boards[winnerBoard])
-
 }
 
-func p2(input []int, boards []board) int {
-	var winnerBoard, currInput int
-	wmap := make(map[int]bool)
+func p2(input []int, boards []*board) {
+	won := make(map[int]bool)
 out:
 	for _, v := range input {
-		for i := 0; i < len(boards); i++ {
-			set(&boards[i], v)
-			if !wmap[i] {
-				if bingo(boards[i]) {
-					wmap[i] = true
+		for i, b := range boards {
+			if won[i] {
+				continue
+			}
+
+			b.set(v)
+			if b.bingo() {
+				won[i] = true
+				if len(won) == len(boards) {
+					fmt.Println(b.score(v))
+					break out
 				}
 			}
-
-			if len(wmap) == len(boards) {
-				winnerBoard = i
-				currInput = v
-				break out
-			}
 		}
 	}
-
-	return currInput * sumNotVisited(boards[winnerBoard])
-
 }
 
-func sumNotVisited(b board) int {
+func (b board) score(v int) int {
 	sum := 0
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 5; j++ {
@@ -75,10 +66,10 @@ func sumNotVisited(b board) int {
 			}
 		}
 	}
-	return sum
+	return sum * v
 }
 
-func set(b *board, v int) {
+func (b *board) set(v int) {
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 5; j++ {
 			if b.values[i][j] == v {
@@ -88,7 +79,7 @@ func set(b *board, v int) {
 	}
 }
 
-func bingo(b board) bool {
+func (b board) bingo() bool {
 	var rSum, cSum int
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 5; j++ {
@@ -104,7 +95,7 @@ func bingo(b board) bool {
 	return false
 }
 
-func parseInput() ([]int, []board) {
+func parseInput() ([]int, []*board) {
 	b, err := ioutil.ReadFile(*inputFile)
 	if err != nil {
 		log.Fatal(err)
@@ -112,7 +103,7 @@ func parseInput() ([]int, []board) {
 
 	lines := strings.Split(string(b), "\n")
 	var input []int
-	var boards []board
+	var boards []*board
 
 	for _, v := range strings.Split(lines[0], ",") {
 		vi, _ := strconv.Atoi(v)
@@ -126,7 +117,7 @@ func parseInput() ([]int, []board) {
 	return input, boards
 }
 
-func parseBoard(lines []string) board {
+func parseBoard(lines []string) *board {
 	var b board
 	for r, line := range lines {
 		var c int
@@ -139,5 +130,5 @@ func parseBoard(lines []string) board {
 			c++
 		}
 	}
-	return b
+	return &b
 }
