@@ -29,92 +29,85 @@ type Line struct {
 }
 
 func p1(lines []Line) {
-	var visited [1000][1000]int
+	visited := make(map[Point]int)
 	for _, l := range lines {
-		drawLine(&visited, l)
+		drawLine(visited, l)
 	}
 	fmt.Println(overlap(visited))
 }
 
 func p2(lines []Line) {
-	var visited [1000][1000]int
+	visited := make(map[Point]int)
 	for _, l := range lines {
-		drawLineWithDiagonal(&visited, l)
+		drawLineWithDiagonal(visited, l)
 	}
 	fmt.Println(overlap(visited))
 }
 
-func drawLine(visited *[1000][1000]int, l Line) {
-	xf, yf := l.from.x, l.from.y
-	xt, yt := l.to.x, l.to.y
-	if xf == xt {
-		if yf > yt {
-			yf, yt = yt, yf
+func drawLine(visited map[Point]int, l Line) {
+	start := l.from
+	end := l.to
+	if start.x == end.x {
+		if end.y < start.y {
+			start, end = end, start
 		}
-		for i := yf; i <= yt; i++ {
-			visited[i][xf] += 1
+
+		for i := start.y; i <= end.y; i++ {
+			visited[Point{start.x, i}]++
 		}
-	} else if yf == yt {
-		if xf > xt {
-			xf, xt = xt, xf
+	} else if start.y == end.y {
+		if end.x < start.x {
+			start, end = end, start
 		}
-		for i := xf; i <= xt; i++ {
-			visited[yf][i] += 1
+
+		for i := start.x; i <= end.x; i++ {
+			visited[Point{i, start.y}]++
 		}
 	}
 }
 
-func drawLineWithDiagonal(visited *[1000][1000]int, l Line) {
-	xf, yf := l.from.x, l.from.y
-	xt, yt := l.to.x, l.to.y
-	if xf == xt {
-		if yf > yt {
-			yf, yt = yt, yf
+func drawLineWithDiagonal(visited map[Point]int, l Line) {
+	start := l.from
+	end := l.to
+	if start.x == end.x {
+		if end.y < start.y {
+			start, end = end, start
 		}
-		for i := yf; i <= yt; i++ {
-			visited[i][xf] += 1
+
+		for i := start.y; i <= end.y; i++ {
+			visited[Point{start.x, i}]++
 		}
-	} else if yf == yt {
-		if xf > xt {
-			xf, xt = xt, xf
+	} else if start.y == end.y {
+		if end.x < start.x {
+			start, end = end, start
 		}
-		for i := xf; i <= xt; i++ {
-			visited[yf][i] += 1
+
+		for i := start.x; i <= end.x; i++ {
+			visited[Point{i, start.y}]++
 		}
 	} else {
-		if xt < xf {
-			xf, yf, xt, yt = xt, yt, xf, yf
-		}
-		if yf < yt {
-			i := xf
-			j := yf
-
-			for i <= xt && j <= yt {
-				visited[j][i] += 1
-				i++
-				j++
-			}
-		} else {
-			i := xf
-			j := yf
-
-			for i <= xt && j >= yt {
-				visited[j][i] += 1
-				i++
-				j--
-			}
+		if end.x < start.x {
+			start, end = end, start
 		}
 
+		incY := 1
+		if end.y < start.y {
+			incY = -1
+		}
+
+		j := start.y
+		for i := start.x; i <= end.x; i++ {
+			visited[Point{i, j}]++
+			j += incY
+		}
 	}
 }
 
-func overlap(visited [1000][1000]int) int {
+func overlap(visited map[Point]int) int {
 	count := 0
-	for i := 0; i < 1000; i++ {
-		for j := 0; j < 1000; j++ {
-			if visited[i][j] >= 2 {
-				count++
-			}
+	for _, v := range visited {
+		if v >= 2 {
+			count++
 		}
 	}
 	return count
@@ -128,11 +121,11 @@ func parseInput() []Line {
 
 	inputlines := strings.Split(string(b), "\n")
 	var lines []Line
-	for _, l := range inputlines {
-		if l == "" {
+	for _, line := range inputlines {
+		if line == "" {
 			continue
 		}
-		lines = append(lines, parseLine(l))
+		lines = append(lines, parseLine(line))
 	}
 
 	return lines
