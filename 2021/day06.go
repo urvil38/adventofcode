@@ -18,36 +18,23 @@ func main() {
 	fmt.Println(p1(input, 256))
 }
 
-type fish struct {
-	k int
-	v int
-}
-
-func fishes(lifetime map[int]int) []fish {
-	var fs []fish
-	for k, v := range lifetime {
-		fs = append(fs, fish{k: k, v: v})
-	}
-	return fs
-}
-
 func p1(population []int, totalDays int) int {
-	lifetime := make(map[int]int)
+	var lifetime [9]int
 
 	for _, v := range population {
 		lifetime[v]++
 	}
 
 	for day := 0; day < totalDays; day++ {
-		fs := fishes(lifetime)
-		for _, f := range fs {
-			if f.k == 0 {
-				lifetime[0] -= f.v
-				lifetime[6] += f.v
-				lifetime[8] += f.v
+		fs := lifetime
+		for k, v := range fs {
+			if k == 0 {
+				lifetime[0] -= v
+				lifetime[6] += v
+				lifetime[8] += v
 			} else {
-				lifetime[f.k] -= f.v
-				lifetime[f.k-1] += f.v
+				lifetime[k] -= v
+				lifetime[k-1] += v
 			}
 		}
 	}
