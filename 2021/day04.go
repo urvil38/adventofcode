@@ -19,8 +19,7 @@ func main() {
 }
 
 type board struct {
-	values  [5][5]int
-	visited [5][5]int
+	values [5][5]int
 }
 
 func p1(input []int, boards []*board) {
@@ -61,7 +60,7 @@ func (b board) score(v int) int {
 	sum := 0
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 5; j++ {
-			if b.visited[i][j] == 0 {
+			if b.values[i][j] != -1 {
 				sum += b.values[i][j]
 			}
 		}
@@ -73,24 +72,28 @@ func (b *board) set(v int) {
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 5; j++ {
 			if b.values[i][j] == v {
-				b.visited[i][j] = 1
+				b.values[i][j] = -1
 			}
 		}
 	}
 }
 
 func (b board) bingo() bool {
-	var rSum, cSum int
+	var rc, cc int
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 5; j++ {
-			rSum += b.visited[i][j]
-			cSum += b.visited[j][i]
+			if b.values[i][j] == -1 {
+				rc++
+			}
+			if b.values[j][i] == -1 {
+				cc++
+			}
 		}
 
-		if rSum == 5 || cSum == 5 {
+		if rc == 5 || cc == 5 {
 			return true
 		}
-		rSum, cSum = 0, 0
+		rc, cc = 0, 0
 	}
 	return false
 }
