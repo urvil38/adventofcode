@@ -26,16 +26,23 @@ func p1(input []string) []string {
 		isLegal := true
 		for _, c := range str {
 			if startBrace(c) {
-				s.push(c)
+				switch c {
+				case '{':
+					s.push('}')
+				case '<':
+					s.push('>')
+				case '[':
+					s.push(']')
+				case '(':
+					s.push(')')
+				}
 			} else {
 				if !s.empty() {
 					top := s.pop()
-					if matchingBraces(top, c) {
-						continue
+					if top != c {
+						isLegal = false
+						illegalChar[c]++
 					}
-
-					isLegal = false
-					illegalChar[c]++
 				}
 			}
 		}
@@ -53,7 +60,17 @@ func p2(lines []string) {
 		s := NewStack()
 		for _, c := range str {
 			if startBrace(c) {
-				s.push(c)
+				switch c {
+				case '{':
+					s.push('}')
+				case '<':
+					s.push('>')
+				case '[':
+					s.push(']')
+				case '(':
+					s.push(')')
+				}
+
 			} else {
 				if !s.empty() {
 					s.pop()
@@ -70,13 +87,6 @@ func p2(lines []string) {
 	fmt.Println(scores[mid])
 }
 
-func matchingBraces(top, c rune) bool {
-	if top == '<' && c == '>' || top == '[' && c == ']' || top == '{' && c == '}' || top == '(' && c == ')' {
-		return true
-	}
-	return false
-}
-
 func startBrace(c rune) bool {
 	if c == '{' || c == '[' || c == '<' || c == '(' {
 		return true
@@ -86,10 +96,10 @@ func startBrace(c rune) bool {
 
 func score(s *stack) int {
 	ss := map[rune]int{
-		'(': 1,
-		'[': 2,
-		'{': 3,
-		'<': 4,
+		')': 1,
+		']': 2,
+		'}': 3,
+		'>': 4,
 	}
 	score := 0
 	for !s.empty() {
