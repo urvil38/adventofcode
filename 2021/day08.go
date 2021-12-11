@@ -28,7 +28,8 @@ func p1(ses []signalEntry) {
 	count := 0
 	for _, se := range ses {
 		for _, d := range se.digits {
-			if len(d) == 2 || len(d) == 3 || len(d) == 4 || len(d) == 7 {
+			switch len(d) {
+			case 2, 3, 4, 7:
 				count++
 			}
 		}
@@ -76,11 +77,11 @@ func p2(ses []signalEntry) {
 			}
 		}
 
-		d2 := l[2][0]
+		d1 := l[2][0]
 		for _, v := range l[5] {
 			if !contain(d9, v) {
 				d[sortStr(v)] = "2"
-			} else if contain(v, d2) {
+			} else if contain(v, d1) {
 				d[sortStr(v)] = "3"
 			} else {
 				d[sortStr(v)] = "5"
