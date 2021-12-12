@@ -57,14 +57,13 @@ func p2(input [][]int, w, h int) {
 	for row := 0; row < h; row++ {
 		for col := 0; col < w; col++ {
 			if !visited[row][col] && input[row][col] == -1 {
-				q := NewQueue()
+				q := NewQueue[Pos]()
 				q.enqueue(Pos{row: row, col: col})
 				visited[row][col] = true
 				var count int
 				for !q.empty() {
 					count++
 					e := q.dequeue()
-
 					for _, d := range dirs {
 						dx := e.row + d[0]
 						dy := e.col + d[1]
@@ -110,22 +109,22 @@ type Pos struct {
 	col int
 }
 
-type queue struct {
-	q []Pos
+type queue[T any] struct {
+	q []T
 }
 
-func NewQueue() *queue {
-	return &queue{}
+func NewQueue[T any]() *queue[T] {
+	return &queue[T]{}
 }
 
-func (q *queue) enqueue(x Pos) Pos {
+func (q *queue[T]) enqueue(x T) T {
 	q.q = append(q.q, x)
 	return x
 }
 
-func (q *queue) dequeue() Pos {
+func (q *queue[T]) dequeue() T {
 	if len(q.q) == 0 {
-		var v Pos
+		var v T
 		return v
 	}
 
@@ -134,16 +133,16 @@ func (q *queue) dequeue() Pos {
 	return e
 }
 
-func (q queue) front() Pos {
+func (q queue[T]) front() T {
 	if len(q.q) == 0 {
-		var v Pos
+		var v T
 		return v
 	}
 
 	return q.q[0]
 }
 
-func (q queue) empty() bool {
+func (q queue[T]) empty() bool {
 	if len(q.q) == 0 {
 		return true
 	}
