@@ -122,7 +122,7 @@ func sortStr(s string) string {
 
 func contain(s, v string) bool {
 	for _, c := range v {
-		if !strings.Contains(s, string(c)) {
+		if !strings.ContainsRune(s, c) {
 			return false
 		}
 	}
