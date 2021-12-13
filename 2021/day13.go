@@ -61,7 +61,7 @@ func printpaper(pm map[Point]int) {
 	for row := 0; row <= h; row++ {
 		var str []string
 		for col := 0; col <= w; col++ {
-			str = append(str, ".")
+			str = append(str, " ")
 		}
 		grid = append(grid, str)
 	}
