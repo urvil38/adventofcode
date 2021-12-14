@@ -13,12 +13,12 @@ var inputFile = flag.String("inputFile", "inputs/day14.input", "Relative file pa
 
 func main() {
 	flag.Parse()
-	tmpl, seq := parseInput()
-	p1(tmpl, seq, 10)
-	p1(tmpl, seq, 40)
+	tmpl, rules := parseInput()
+	p1(tmpl, rules, 10)
+	p1(tmpl, rules, 40)
 }
 
-func p1(tmpl string, seq map[string]string, step int) {
+func p1(tmpl string, rules map[string]string, steps int) {
 	elements := make(map[string]int)
 	pairs := make(map[string]int)
 	for _, c := range tmpl {
@@ -28,11 +28,11 @@ func p1(tmpl string, seq map[string]string, step int) {
 	for i := 0; i < len(tmpl)-1; i++ {
 		pairs[tmpl[i:i+2]]++
 	}
-	
-	for i := 0; i < step; i++ {
+
+	for i := 0; i < steps; i++ {
 		newPairs := make(map[string]int)
 		for pair, v := range pairs {
-			e := seq[pair]
+			e := rules[pair]
 			elements[e] += v
 			p1 := string(pair[0]) + string(e)
 			p2 := string(e) + string(pair[1])
@@ -59,14 +59,14 @@ func parseInput() (string, map[string]string) {
 
 	si := strings.Split(string(b), "\n")
 	tmpl := si[0]
-	seq := make(map[string]string)
+	rules := make(map[string]string)
 	for i, v := range si {
 		if v == "" || i < 2 {
 			continue
 		}
 		s := strings.Split(v, " -> ")
-		seq[s[0]] = s[1]
+		rules[s[0]] = s[1]
 	}
 
-	return tmpl, seq
+	return tmpl, rules
 }
