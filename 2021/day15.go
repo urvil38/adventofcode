@@ -15,9 +15,9 @@ var inputFile = flag.String("inputFile", "inputs/day15.input", "Relative file pa
 func main() {
 	flag.Parse()
 	input := parseInput()
-	findPathP1(input)
+	findPath(input)
 	ei := extendInput(input)
-	findPathP2(ei)
+	findPath(ei)
 }
 
 type Pos struct {
@@ -36,7 +36,6 @@ type PriorityQueue []*Item
 func (pq PriorityQueue) Len() int { return len(pq) }
 
 func (pq PriorityQueue) Less(i, j int) bool {
-	// We want Pop to give us the highest, not lowest, priority so we use greater than here.
 	return pq[i].cost < pq[j].cost
 }
 
@@ -63,23 +62,29 @@ func (pq *PriorityQueue) Pop() interface{} {
 	return item
 }
 
-func findPathP1(graph [100][100]int) {
-	q := make(PriorityQueue, 1)
-	q[0] = &Item{x: 0, y: 0, cost: 0, index: 0}
+func findPath(graph [][]int) {
+	h := len(graph)
+	w := len(graph[0])
+
+	var q PriorityQueue
+	q = append(q, &Item{x: 0, y: 0, cost: 0, index: 0})
 	heap.Init(&q)
+
 	dirs := [][]int{{0, 1}, {1, 0}, {-1, 0}, {0, -1}}
 	dist := make(map[Pos]int)
-	for i := 0; i < 100; i++ {
-		for j := 0; j < 100; j++ {
+	for i := 0; i < h; i++ {
+		for j := 0; j < w; j++ {
 			dist[Pos{x: i, y: j}] = 99999
 		}
 	}
+
 	dist[Pos{x: 0, y: 0}] = 0
+
 	for q.Len() > 0 {
 		e := heap.Pop(&q).(*Item)
 
-		if e.x == 99 && e.y == 99 {
-			fmt.Println(dist[Pos{x: 99, y: 99}])
+		if e.x == w-1 && e.y == h-1 {
+			fmt.Println(dist[Pos{x: w - 1, y: h - 1}])
 			return
 		}
 
@@ -87,7 +92,7 @@ func findPathP1(graph [100][100]int) {
 			dx := e.x + d[0]
 			dy := e.y + d[1]
 
-			if isValid(dx, dy, 100, 100) {
+			if isValid(dx, dy, w, h) {
 				next := Item{x: dx, y: dy, cost: e.cost + graph[dx][dy]}
 				if next.cost < dist[Pos{x: dx, y: dy}] {
 					heap.Push(&q, &next)
@@ -99,80 +104,22 @@ func findPathP1(graph [100][100]int) {
 
 }
 
-func findPathP2(graph [500][500]int) {
-	q := make(PriorityQueue, 1)
-	q[0] = &Item{x: 0, y: 0, cost: 0, index: 0}
-	heap.Init(&q)
-	dirs := [][]int{{0, 1}, {1, 0}, {-1, 0}, {0, -1}}
-	dist := make(map[Pos]int)
-	for i := 0; i < 500; i++ {
-		for j := 0; j < 500; j++ {
-			dist[Pos{x: i, y: j}] = 99999
-		}
+func extendInput(input [][]int) [][]int {
+	rows := len(input)
+	cols := len(input[0])
+	output := make([][]int, rows*5)
+	for i := range output {
+		output[i] = make([]int, cols*5)
 	}
-	dist[Pos{x: 0, y: 0}] = 0
-	for q.Len() > 0 {
-		e := heap.Pop(&q).(*Item)
-
-		if e.x == 499 && e.y == 499 {
-			fmt.Println(dist[Pos{x: 499, y: 499}])
-			return
-		}
-
-		for _, d := range dirs {
-			dx := e.x + d[0]
-			dy := e.y + d[1]
-
-			if isValid(dx, dy, 500, 500) {
-				next := Item{x: dx, y: dy, cost: e.cost + graph[dx][dy]}
-				if next.cost < dist[Pos{x: dx, y: dy}] {
-					heap.Push(&q, &next)
-					dist[Pos{x: next.x, y: next.y}] = next.cost
+	for row := 0; row < rows; row++ {
+		for col := 0; col < cols; col++ {
+			for i := 0; i < 5; i++ {
+				for j := 0; j < 5; j++ {
+					inc := i + j
+					val := 1 + ((input[row][col] + inc - 1) % 9)
+					output[row+i*rows][col+j*cols] = val
 				}
 			}
-		}
-	}
-
-}
-
-func extend(input [100][100]int) [][100][100]int {
-	var extend [][100][100]int
-
-	for k := 0; k < 5; k++ {
-		var arr [100][100]int
-		for i := 0; i < 100; i++ {
-			for j := 0; j < 100; j++ {
-				v := input[i][j] + k
-				if v > 9 {
-					v = v % 9
-				}
-				arr[i][j] = v
-			}
-		}
-		extend = append(extend, arr)
-	}
-
-	return extend
-}
-
-func extendInput(input [100][100]int) [500][500]int {
-	arrs := extend(input)
-	var final [][100][100]int
-	var output [500][500]int
-	final = append(final, arrs...)
-	for i := 1; i < 5; i++ {
-		final = append(final, extend(arrs[i])...)
-	}
-	k := 0
-	for i := 0; i < 500; i += 100 {
-		for j := 0; j < 500; j += 100 {
-			v1 := final[k]
-			for r, row := range v1 {
-				for c, col := range row {
-					output[r+i][c+j] = col
-				}
-			}
-			k++
 		}
 	}
 	return output
@@ -182,13 +129,16 @@ func isValid(x, y, h, w int) bool {
 	return x >= 0 && y >= 0 && x < w && y < h
 }
 
-func parseInput() [100][100]int {
+func parseInput() [][]int {
 	b, err := ioutil.ReadFile(*inputFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var input [100][100]int
+	input := make([][]int, 100)
+	for i := range input {
+		input[i] = make([]int, 100)
+	}
 	si := strings.Split(string(b), "\n")
 	for r, row := range si {
 		for c, v := range row {
