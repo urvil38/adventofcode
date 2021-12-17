@@ -33,7 +33,7 @@ func p1(t Target) {
 	prob.t = t
 
 	var count int
-	for i := -t.end.x; i <= t.end.x; i++ {
+	for i := 0; i <= t.end.x; i++ {
 		for j := t.end.y; j <= -t.end.y; j++ {
 			prob.setVelocity(i, j)
 			prob.pos = Pos{x: 0, y: 0}
