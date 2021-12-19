@@ -18,6 +18,7 @@ func main() {
 }
 
 type Point [3]int
+
 type Final map[Point]bool
 
 type PDir struct {
@@ -25,6 +26,22 @@ type PDir struct {
 	dir     int
 }
 
+func (p Point) Add(p1 Point) Point {
+	return Point{
+		p[0] + p1[0],
+		p[1] + p1[1],
+		p[2] + p1[2],
+	}
+}
+
+func (p Point) Sub(p1 Point) Point {
+	return Point{
+		p[0] - p1[0],
+		p[1] - p1[1],
+		p[2] - p1[2],
+	}
+
+}
 func p1(beacons [][]Point) {
 	N := len(beacons)
 	final := make(Final)
@@ -54,11 +71,7 @@ func p1(beacons [][]Point) {
 
 	for len(bad) > 0 {
 		found := -1
-
 		for b, _ := range bad {
-			if found > 0 {
-				continue
-			}
 
 			var gScan []Point
 			for v, _ := range final {
@@ -69,13 +82,11 @@ func p1(beacons [][]Point) {
 				bScan := badAdj[PDir{scanner: b, dir: bDir}]
 				vote := make(map[Point]int)
 
-				for bi := 0; bi < len(bScan); bi++ {
-					for gi := 0; gi < len(gScan); gi++ {
-						// b[0] + dx = g[0] => dx = -b[0] + g[0]
-						dx := -bScan[bi][0] + gScan[gi][0]
-						dy := -bScan[bi][1] + gScan[gi][1]
-						dz := -bScan[bi][2] + gScan[gi][2]
-						vote[Point{dx, dy, dz}] += 1
+				for _, bv := range bScan {
+					for _, gv := range gScan {
+						// b[0] + dx = g[0] => dx = g[0] - b[0]
+						np := gv.Sub(bv)
+						vote[np] += 1
 					}
 				}
 
@@ -83,13 +94,15 @@ func p1(beacons [][]Point) {
 					if v >= 12 {
 						pos[b] = p
 						for _, be := range bScan {
-							final[Point{be[0] + p[0], be[1] + p[1], be[2] + p[2]}] = true
+							final[be.Add(p)] = true
 						}
 						found = b
+						goto end
 					}
 				}
 			}
 		}
+	end:
 		delete(bad, found)
 		good[found] = true
 	}
