@@ -57,21 +57,16 @@ func p2(points []Point, folds []Fold) {
 
 func printpaper(pm map[Point]int) {
 	w, h := dimention(pm)
-	var grid [][]string
 	for row := 0; row <= h; row++ {
 		var str []string
 		for col := 0; col <= w; col++ {
-			str = append(str, " ")
+			if pm[Point{x: col, y: row}] > 0 {
+				str = append(str, "#")
+			} else {
+				str = append(str, " ")
+			}
 		}
-		grid = append(grid, str)
-	}
-
-	for p, _ := range pm {
-		grid[p.y][p.x] = "#"
-	}
-
-	for _, s := range grid {
-		fmt.Println(s)
+		fmt.Println(str)
 	}
 }
 
