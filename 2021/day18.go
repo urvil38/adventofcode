@@ -229,41 +229,39 @@ func (p *Pair) expandDepth() *Pair {
 	return p
 }
 
-func parse(s string, depth int, parent *Pair) *Pair {
-	if s[0] != '[' || s[len(s)-1] != ']' {
-		fmt.Printf("invalid string: %s", s)
-		return nil
-	}
-
-	var p Pair
-	p.depth = depth
-	p.parent = parent
-	var posAfterComma int
-	if s[1] == '[' {
-		bktCount := 1
-		for i := 2; bktCount != 0; i++ {
-			switch s[i] {
-			case '[':
-				bktCount++
-			case ']':
-				bktCount--
-			}
-			posAfterComma = i + 2
+func parse(s string, depth int, parent *Pair, side string) *Pair {
+	if s[0] != '[' {
+		val := int(s[0] - '0')
+		if side == "left" {
+			parent.left = &val
+		} else {
+			parent.right = &val
 		}
-		p.leftP = parse(s[1:posAfterComma-1], depth+1, &p)
-	} else {
-		left := int(s[1] - '0')
-		p.left = &left
-		posAfterComma = 3
 	}
 
-	if s[posAfterComma] == '[' {
-		p.rightP = parse(s[posAfterComma:len(s)-1], depth+1, &p)
-	} else {
-		right := int(s[posAfterComma] - '0')
-		p.right = &right
+	n := len(s)
+	level := 0
+
+	for i, v := range s {
+		if v == '[' {
+			level += 1
+		}
+
+		if v == ']' {
+			level -= 1
+		}
+
+		if v == ',' && level == 1 {
+			var p Pair
+			p.parent = parent
+			p.depth = depth
+			p.leftP = parse(s[1:i], depth+1, &p, "left")
+			p.rightP = parse(s[i+1:n-1], depth+1, &p, "right")
+			return &p
+		}
 	}
-	return &p
+	return nil
+
 }
 
 func (p Pair) print() {
@@ -293,7 +291,7 @@ func parseInput() []*Pair {
 		if s == "" {
 			continue
 		}
-		pairs = append(pairs, parse(s, 0, nil))
+		pairs = append(pairs, parse(s, 0, nil, ""))
 	}
 	return pairs
 }
