@@ -35,11 +35,12 @@ type pos struct {
 func update(grid [][]int) int {
 	var moves int
 	visited1 := make(map[pos]bool)
+	w, h := len(grid[0]), len(grid)
 	// update east facing (1) cucumbers
-	for r := 0; r < len(grid); r++ {
-		for c := 0; c < len(grid[0]); c++ {
+	for r := 0; r < h; r++ {
+		for c := 0; c < w; c++ {
 			if grid[r][c] == 1 && !visited1[pos{r: r, c: c}] {
-				ci := (c + 1) % len(grid[0])
+				ci := (c + 1) % w
 				if grid[r][ci] == 0 && !visited1[pos{r: r, c: ci}] {
 					grid[r][c] = 0
 					grid[r][ci] = 1
@@ -52,10 +53,10 @@ func update(grid [][]int) int {
 	}
 	visited2 := make(map[pos]bool)
 	// update down facing (2) cucumbers
-	for c := 0; c < len(grid[0]); c++ {
-		for r := 0; r < len(grid); r++ {
+	for c := 0; c < w; c++ {
+		for r := 0; r < h; r++ {
 			if grid[r][c] == 2 && !visited2[pos{r: r, c: c}] {
-				ri := (r + 1) % len(grid)
+				ri := (r + 1) % h
 				if grid[ri][c] == 0 && !visited2[pos{r: ri, c: c}] {
 					grid[r][c] = 0
 					grid[ri][c] = 2
