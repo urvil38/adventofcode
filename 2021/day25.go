@@ -36,25 +36,16 @@ func update(grid [][]int) int {
 	var moves int
 	visited1 := make(map[pos]bool)
 	// update east facing (1) cucumbers
-	for r, row := range grid {
-		for c, col := range row {
-			if col == 1 && !visited1[pos{r: r, c: c}] {
-				if c+1 < len(row) {
-					if grid[r][c+1] == 0 && !visited1[pos{r: r, c: c + 1}] {
-						grid[r][c] = 0
-						grid[r][c+1] = 1
-						visited1[pos{r: r, c: c}] = true
-						visited1[pos{r: r, c: c + 1}] = true
-						moves++
-					}
-				} else {
-					if grid[r][0] == 0 && !visited1[pos{r: r, c: 0}] {
-						grid[r][c] = 0
-						grid[r][0] = 1
-						visited1[pos{r: r, c: c}] = true
-						visited1[pos{r: r, c: 0}] = true
-						moves++
-					}
+	for r := 0; r < len(grid); r++ {
+		for c := 0; c < len(grid[0]); c++ {
+			if grid[r][c] == 1 && !visited1[pos{r: r, c: c}] {
+				ci := (c + 1) % len(grid[0])
+				if grid[r][ci] == 0 && !visited1[pos{r: r, c: ci}] {
+					grid[r][c] = 0
+					grid[r][ci] = 1
+					visited1[pos{r: r, c: c}] = true
+					visited1[pos{r: r, c: ci}] = true
+					moves++
 				}
 			}
 		}
@@ -64,22 +55,13 @@ func update(grid [][]int) int {
 	for c := 0; c < len(grid[0]); c++ {
 		for r := 0; r < len(grid); r++ {
 			if grid[r][c] == 2 && !visited2[pos{r: r, c: c}] {
-				if r+1 < len(grid) {
-					if grid[r+1][c] == 0 && !visited2[pos{r: r + 1, c: c}] {
-						grid[r][c] = 0
-						grid[r+1][c] = 2
-						visited2[pos{r: r, c: c}] = true
-						visited2[pos{r: r + 1, c: c}] = true
-						moves++
-					}
-				} else {
-					if grid[0][c] == 0 && !visited2[pos{r: 0, c: c}] {
-						grid[r][c] = 0
-						grid[0][c] = 2
-						visited2[pos{r: r, c: c}] = true
-						visited2[pos{r: 0, c: c}] = true
-						moves++
-					}
+				ri := (r + 1) % len(grid)
+				if grid[ri][c] == 0 && !visited2[pos{r: ri, c: c}] {
+					grid[r][c] = 0
+					grid[ri][c] = 2
+					visited2[pos{r: r, c: c}] = true
+					visited2[pos{r: ri, c: c}] = true
+					moves++
 				}
 			}
 		}
