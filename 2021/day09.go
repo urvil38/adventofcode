@@ -43,13 +43,9 @@ func p1(input [][]int, w, h int) [][]int {
 }
 
 func p2(input [][]int, w, h int) {
-	var visited [][]bool
-	for i := 0; i < h; i++ {
-		var r []bool
-		for j := 0; j < w; j++ {
-			r = append(r, false)
-		}
-		visited = append(visited, r)
+	visited := make([][]bool, h)
+	for i := range visited {
+		visited[i] = make([]bool, w)
 	}
 
 	dirs := [][]int{{-1, 0}, {1, 0}, {0, 1}, {0, -1}}

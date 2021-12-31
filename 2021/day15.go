@@ -25,9 +25,8 @@ type Pos struct {
 }
 
 type Item struct {
-	x, y  int
-	cost  int
-	index int
+	x, y int
+	cost int
 }
 
 // A PriorityQueue implements heap.Interface and holds Items.
@@ -41,14 +40,10 @@ func (pq PriorityQueue) Less(i, j int) bool {
 
 func (pq PriorityQueue) Swap(i, j int) {
 	pq[i], pq[j] = pq[j], pq[i]
-	pq[i].index = i
-	pq[j].index = j
 }
 
 func (pq *PriorityQueue) Push(x interface{}) {
-	n := len(*pq)
 	item := x.(*Item)
-	item.index = n
 	*pq = append(*pq, item)
 }
 
@@ -56,8 +51,7 @@ func (pq *PriorityQueue) Pop() interface{} {
 	old := *pq
 	n := len(old)
 	item := old[n-1]
-	old[n-1] = nil  // avoid memory leak
-	item.index = -1 // for safety
+	old[n-1] = nil // avoid memory leak
 	*pq = old[0 : n-1]
 	return item
 }
@@ -67,7 +61,7 @@ func findPath(graph [][]int) {
 	w := len(graph[0])
 
 	var q PriorityQueue
-	q = append(q, &Item{x: 0, y: 0, cost: 0, index: 0})
+	q = append(q, &Item{x: 0, y: 0, cost: 0})
 	heap.Init(&q)
 
 	dirs := [][]int{{0, 1}, {1, 0}, {-1, 0}, {0, -1}}

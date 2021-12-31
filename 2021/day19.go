@@ -59,12 +59,13 @@ func p1(beacons [][]Point) {
 		bad[i] = true
 	}
 
+	perms := permutations([]int{0, 1, 2})
 	badAdj := make(map[PDir][]Point)
 	for s := 0; s < N; s++ {
 		for dir := 0; dir < 48; dir++ {
 			for _, beacon := range beacons[s] {
 				pdir := PDir{scanner: s, dir: dir}
-				badAdj[pdir] = append(badAdj[pdir], adjust(beacon, dir))
+				badAdj[pdir] = append(badAdj[pdir], adjust(beacon, dir, perms))
 			}
 		}
 	}
@@ -80,7 +81,7 @@ func p1(beacons [][]Point) {
 
 			for bDir := 0; bDir < 48; bDir++ {
 				bScan := badAdj[PDir{scanner: b, dir: bDir}]
-				vote := make(map[Point]int)
+				vote := make(map[Point]int, len(bScan)*len(gScan))
 
 				for _, bv := range bScan {
 					for _, gv := range gScan {
@@ -129,9 +130,9 @@ func abs(a int) int {
 	return a
 }
 
-func adjust(beacon Point, dir int) Point {
+func adjust(beacon Point, dir int, perms [][]int) Point {
 	ret := beacon
-	for i, v := range permutations([]int{0, 1, 2}) {
+	for i, v := range perms {
 		if dir>>3 == i {
 			ret = Point{ret[v[0]], ret[v[1]], ret[v[2]]}
 		}
