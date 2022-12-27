@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var mapping = map[string]int{
+var scores = map[string]int{
 	"A": 1,
 	"B": 2,
 	"C": 3,
@@ -58,12 +58,12 @@ func p1(input [][]string) int {
 		op, me := moves[0], moves[1]
 		if win[me] == op {
 			score += 6
-			score += mapping[me]
+			score += scores[me]
 		} else if draw[me] == op {
 			score += 3
-			score += mapping[me]
+			score += scores[me]
 		} else {
-			score += mapping[me]
+			score += scores[me]
 		}
 	}
 	return score
@@ -74,13 +74,13 @@ func p2(input [][]string) int {
 	for _, moves := range input {
 		op, me := moves[0], moves[1]
 		if me == "X" {
-			score += mapping[lose[op]]
+			score += scores[lose[op]]
 		} else if me == "Y" {
 			score += 3
-			score += mapping[draw[op]]
+			score += scores[draw[op]]
 		} else {
 			score += 6
-			score += mapping[win[op]]
+			score += scores[win[op]]
 		}
 	}
 	return score
