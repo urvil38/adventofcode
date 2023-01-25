@@ -75,7 +75,7 @@ func (root *directory) DirToBeDeleted(candidateNode *directory, targetSize int) 
 	}
 
 	if root.size < targetSize {
-			return candidateNode
+		return candidateNode
 	}
 
 	if candidateNode == nil || root.size <= candidateNode.size {
@@ -96,7 +96,7 @@ func parseInput() *directory {
 	root := &directory{
 		parent: nil,
 		name:   "/",
-		isDir: true,
+		isDir:  true,
 		dirs:   make([]*directory, 0),
 	}
 
