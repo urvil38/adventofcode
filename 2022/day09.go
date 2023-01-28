@@ -30,8 +30,6 @@ func p(moves []move, knots int) {
 
 	tailPosHistory[Pos{x: 0, y: 0}] = true
 
-	dirs := [][]int{{0, 0}, {0, 1}, {0, -1}, {1, 0}, {-1, 0}, {-1, -1}, {1, -1}, {1, 1}, {-1, 1}}
-
 	for _, m := range moves {
 
 		for step := 0; step < m.steps; step++ {
