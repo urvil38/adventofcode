@@ -24,9 +24,6 @@ func p(moves []move, knots int) {
 	tailPosHistory := make(map[Pos]bool)
 
 	rope := make([]Pos, knots)
-	for i, _ := range rope {
-		rope[i] = Pos{x: 0, y: 0}
-	}
 
 	tailPosHistory[Pos{x: 0, y: 0}] = true
 

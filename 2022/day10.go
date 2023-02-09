@@ -95,7 +95,7 @@ func parseInput() []instruction {
 func parseInstruction(s string) instruction {
 	ss := strings.Split(s, " ")
 	if ss[0] == "noop" {
-		return instruction{op: ss[0], val: 0}
+		return instruction{op: ss[0]}
 	}
 	val, _ := strconv.Atoi(ss[1])
 	return instruction{op: ss[0], val: val}
