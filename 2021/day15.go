@@ -1,7 +1,7 @@
 package main
 
 import (
-	"container/heap"
+	"adventofcode/lib"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -24,76 +24,37 @@ type Pos struct {
 	x, y int
 }
 
-type Item struct {
-	x, y int
-	cost int
-}
-
-// A PriorityQueue implements heap.Interface and holds Items.
-type PriorityQueue []*Item
-
-func (pq PriorityQueue) Len() int { return len(pq) }
-
-func (pq PriorityQueue) Less(i, j int) bool {
-	return pq[i].cost < pq[j].cost
-}
-
-func (pq PriorityQueue) Swap(i, j int) {
-	pq[i], pq[j] = pq[j], pq[i]
-}
-
-func (pq *PriorityQueue) Push(x interface{}) {
-	item := x.(*Item)
-	*pq = append(*pq, item)
-}
-
-func (pq *PriorityQueue) Pop() interface{} {
-	old := *pq
-	n := len(old)
-	item := old[n-1]
-	old[n-1] = nil // avoid memory leak
-	*pq = old[0 : n-1]
-	return item
-}
-
 func findPath(graph [][]int) {
 	h := len(graph)
 	w := len(graph[0])
 
-	var q PriorityQueue
-	q = append(q, &Item{x: 0, y: 0, cost: 0})
-	heap.Init(&q)
+	wq := lib.NewWorkQueue[Pos]()
+	wq.Add(Pos{0, 0}, Pos{0, 0}, 0)
 
-	dirs := [][]int{{0, 1}, {1, 0}, {-1, 0}, {0, -1}}
-	dist := make(map[Pos]int)
-	for i := 0; i < h; i++ {
-		for j := 0; j < w; j++ {
-			dist[Pos{x: i, y: j}] = 99999
+	add := func(prev, p Pos, cost int) {
+		if p.x < 0 || p.y < 0 || p.x >= h || p.y >= w {
+			return
 		}
+		cost += graph[p.x][p.y]
+		wq.Add(prev, p, cost)
+	}
+	
+	visit := func(p Pos, cost int) {
+		add(p, Pos{p.x - 1, p.y}, cost)
+		add(p, Pos{p.x + 1, p.y}, cost)
+		add(p, Pos{p.x, p.y - 1}, cost)
+		add(p, Pos{p.x, p.y + 1}, cost)
 	}
 
-	dist[Pos{x: 0, y: 0}] = 0
-
-	for q.Len() > 0 {
-		e := heap.Pop(&q).(*Item)
+	for !wq.Empty() {
+		e, cost := wq.Next()
 
 		if e.x == w-1 && e.y == h-1 {
-			fmt.Println(dist[Pos{x: w - 1, y: h - 1}])
+			fmt.Println(cost)
 			return
 		}
 
-		for _, d := range dirs {
-			dx := e.x + d[0]
-			dy := e.y + d[1]
-
-			if isValid(dx, dy, w, h) {
-				next := Item{x: dx, y: dy, cost: e.cost + graph[dx][dy]}
-				if next.cost < dist[Pos{x: dx, y: dy}] {
-					heap.Push(&q, &next)
-					dist[Pos{x: next.x, y: next.y}] = next.cost
-				}
-			}
-		}
+		visit(e, cost)
 	}
 
 }
@@ -117,10 +78,6 @@ func extendInput(input [][]int) [][]int {
 		}
 	}
 	return output
-}
-
-func isValid(x, y, h, w int) bool {
-	return x >= 0 && y >= 0 && x < w && y < h
 }
 
 func parseInput() [][]int {
