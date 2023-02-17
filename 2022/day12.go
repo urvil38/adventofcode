@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 )
 
 var inputFile = flag.String("inputFile", "inputs/day12.input", "Relative file path to use as input.")
@@ -34,7 +35,7 @@ func p1(grid [][]byte, debug bool) {
 }
 
 func p2(grid [][]byte, debug bool) {
-	min := 999999
+	min := math.MaxInt
 
 	for i, row := range grid {
 		if row[0] == 'a' {

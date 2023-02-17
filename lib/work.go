@@ -2,76 +2,76 @@ package lib
 
 import "container/heap"
 
-type Work[State comparable] struct {
-	heap []heapEntry[State]
-	pos  map[State]int
-	prev map[State]State
+type Work[T comparable] struct {
+	heap []heapEntry[T]
+	pos  map[T]int
+	prev map[T]T
 }
 
-type heapEntry[State comparable] struct {
-	b    State
+type heapEntry[T comparable] struct {
+	b    T
 	cost int
 }
 
-func (w *Work[State]) Add(prev, b State, c int) {
-	if i, ok := w.pos[b]; ok {
+func (w *Work[T]) Add(prev, curr T, c int) {
+	if i, ok := w.pos[curr]; ok {
 		if i < 0 || w.heap[i].cost <= c {
 			return
 		}
 		w.heap[i].cost = c
-		heap.Fix((*byCost[State])(w), i)
+		heap.Fix((*byCost[T])(w), i)
 	} else {
-		heap.Push((*byCost[State])(w), heapEntry[State]{b, c})
+		heap.Push((*byCost[T])(w), heapEntry[T]{curr, c})
 	}
-	w.prev[b] = prev
+	w.prev[curr] = prev
 }
 
-func (w *Work[State]) Next() (State, int) {
-	e := heap.Pop((*byCost[State])(w)).(heapEntry[State])
+func (w *Work[T]) Next() (T, int) {
+	e := heap.Pop((*byCost[T])(w)).(heapEntry[T])
 	return e.b, e.cost
 }
 
-func (w *Work[State]) Empty() bool {
+func (w *Work[T]) Empty() bool {
 	return len(w.heap) == 0
 }
 
-func (w *Work[State]) Path(b State) []State {
+func (w *Work[T]) Path(b T) []T {
 	prev := w.prev[b]
 	if prev == b {
-		return []State{b}
+		return []T{b}
 	}
 	return append(w.Path(prev), b)
 }
 
-func NewWorkQueue[State comparable]() *Work[State] {
-	return &Work[State]{
-		pos: make(map[State]int),
-		prev: make(map[State]State),
+func NewWorkQueue[T comparable]() *Work[T] {
+	return &Work[T]{
+		pos: make(map[T]int),
+		prev: make(map[T]T),
 	}
 }
 
-type byCost[State comparable] Work[State]
+type byCost[T comparable] Work[T]
 
-func (w *byCost[State]) Len() int { return len(w.heap) }
+func (w *byCost[T]) Len() int { return len(w.heap) }
 
-func (w *byCost[State]) Less(i, j int) bool { return w.heap[i].cost < w.heap[j].cost }
+func (w *byCost[T]) Less(i, j int) bool { return w.heap[i].cost < w.heap[j].cost }
 
-func (w *byCost[State]) fix(i int) {
+func (w *byCost[T]) fix(i int) {
 	w.pos[w.heap[i].b] = i
 }
 
-func (w *byCost[State]) Swap(i, j int) {
+func (w *byCost[T]) Swap(i, j int) {
 	w.heap[i], w.heap[j] = w.heap[j], w.heap[i]
 	w.fix(i)
 	w.fix(j)
 }
 
-func (w *byCost[State]) Push(x any) {
-	w.heap = append(w.heap, x.(heapEntry[State]))
+func (w *byCost[T]) Push(x any) {
+	w.heap = append(w.heap, x.(heapEntry[T]))
 	w.fix(len(w.heap)-1)
 }
 
-func (w *byCost[State]) Pop() any {
+func (w *byCost[T]) Pop() any {
 	x := w.heap[len(w.heap)-1]
 	w.heap = w.heap[:len(w.heap)-1]
 	w.pos[x.b] = -1
