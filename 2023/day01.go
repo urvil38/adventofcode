@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -31,8 +30,7 @@ func p2(lines []string) int {
 	sum := 0
 
 	for _, line := range lines {
-		line = convertSplledDigitsToDigit(line)
-		sum += findNumber(line)
+		sum += findNumber(convertSplledDigitsToDigit(line))
 	}
 
 	return sum
@@ -61,26 +59,33 @@ func findNumber(line string) int {
 }
 
 func convertSplledDigitsToDigit(s string) string {
-	re := regexp.MustCompile("one|two|three|four|five|six|seven|eight|nine")
-	digits := map[string]string{
-		"one":   "on1e",
-		"two":   "tw2o",
-		"three": "thr3ee",
-		"four":  "fo4ur",
-		"five":  "fi5ve",
-		"six":   "si6x",
-		"seven": "sev7en",
-		"eight": "eig8ht",
-		"nine":  "ni9ne",
+	digits := ""
+	numAsWords := map[string]string{
+		"one":   "1",
+		"two":   "2",
+		"three": "3",
+		"four":  "4",
+		"five":  "5",
+		"six":   "6",
+		"seven": "7",
+		"eight": "8",
+		"nine":  "9",
 	}
-	for {
-		match := re.FindStringIndex(s)
-		if match == nil {
-			break
+
+	for i, c := range s {
+		if c >= '1' && c <= '9' {
+			digits += string(c)
+		} else {
+			for word, digit := range numAsWords {
+				if strings.HasPrefix(s[i:], word) {
+					digits += string(digit)
+					break
+				}
+			}
 		}
-		s = s[:match[0]] + digits[s[match[0]:match[1]]] + s[match[1]:]
 	}
-	return s
+
+	return digits
 }
 
 func parseInput() []string {
